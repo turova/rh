@@ -1,0 +1,86 @@
+#!/usr/bin/env python3
+
+import argparse
+import time
+import importlib
+import sys
+from types import SimpleNamespace
+
+MODULES_OBJECT = {
+    'INPUTS': 'inputs',
+    'OUTPUTS': 'outputs'
+}
+
+MODULES = SimpleNamespace(**MODULES_OBJECT)
+# MODULES['INPUTS'] = 'inputs'
+# MODULES['OUTPUTS'] = 'outputs'
+    # 'inputs': 'inputs',
+    # 'outputs': 'outputs'
+
+
+REQUIRED_FUNC_NAMES = ['run', 'info']
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Resource Harvester")
+    parser.add_argument('-i', '--inputs', nargs='+', default=['cpu', 'mem'],
+                        help='Space-separated list of input modules to use')
+    parser.add_argument('-o', '--outputs', nargs=1, default=['json'],
+                        help='Output module to use (default is JSON). Currently, only 1 output is supported')
+    parser.add_argument('-t', '--interval', nargs=1, type=float, default=1,
+                        help='Number of seconds between harvest/print cycles')
+    args = parser.parse_args()
+    return vars(args)
+
+def get_modules(module_types, module_args):
+    print('Getting ' + str(module_types) + ' - ' + str(module_args))
+    modules = []
+    modules_error = False
+    for mt in module_types:
+        for i in module_args:
+            try:
+                m = importlib.import_module(mt + '.' + i)
+                for fn in REQUIRED_FUNC_NAMES:
+                    if callable(getattr(m, fn, None)) is False:
+                        print('Module ' + m.__name__ + ' must implement function ' + fn)
+                        modules_error = True
+                        pass
+                modules.append(m)
+            except Exception:
+                print("Error importing input module", i)
+                raise Exception
+                modules_error = True
+        if modules_error:
+            sys.exit(0)
+        print("Imported successfully!")
+    return modules
+
+def main():
+    print("MAIN")
+    args = parse_args()
+    print(args)
+
+    inputs = get_modules([MODULES.INPUTS], args[MODULES.INPUTS])
+    print(inputs)
+
+    outputs = get_modules([MODULES.OUTPUTS], args[MODULES.OUTPUTS])
+    print(outputs)
+
+    for m in inputs:
+        m.init()
+
+    for m in outputs:
+        m.init()
+
+    while True:
+        time.sleep(1)
+        out = {}
+        for m in inputs:
+            print("Getting info from ", m.__name__)
+            out[m.__name__] = m.run()
+        output = outputs[0].run(out)
+        print(output)
+
+
+
+if __name__ == "__main__":
+    main()
