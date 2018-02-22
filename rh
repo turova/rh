@@ -4,16 +4,19 @@ import argparse
 import time
 import importlib
 import sys
-from types import SimpleNamespace
+
+class Cls():
+    pass
 
 MODULES_OBJECT = {
     'INPUTS': 'inputs',
     'OUTPUTS': 'outputs'
 }
 
-MODULES = SimpleNamespace(**MODULES_OBJECT)
-# MODULES['INPUTS'] = 'inputs'
-# MODULES['OUTPUTS'] = 'outputs'
+#MODULES = SimpleNamespace(**MODULES_OBJECT)
+MODULES = Cls()
+MODULES.INPUTS = 'inputs'
+MODULES.OUTPUTS = 'outputs'
     # 'inputs': 'inputs',
     # 'outputs': 'outputs'
 
@@ -38,6 +41,7 @@ def get_modules(module_types, module_args):
     for mt in module_types:
         for i in module_args:
             try:
+                print("Importing " + mt + "." + i)
                 m = importlib.import_module(mt + '.' + i)
                 for fn in REQUIRED_FUNC_NAMES:
                     if callable(getattr(m, fn, None)) is False:
