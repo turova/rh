@@ -35,13 +35,13 @@ def parse_args():
     return vars(args)
 
 def get_modules(module_types, module_args):
-    print('Getting ' + str(module_types) + ' - ' + str(module_args))
+    # print('Getting ' + str(module_types) + ' - ' + str(module_args))
     modules = []
     modules_error = False
     for mt in module_types:
         for i in module_args:
             try:
-                print("Importing " + mt + "." + i)
+                # print("Importing " + mt + "." + i)
                 m = importlib.import_module(mt + '.' + i)
                 for fn in REQUIRED_FUNC_NAMES:
                     if callable(getattr(m, fn, None)) is False:
@@ -55,19 +55,19 @@ def get_modules(module_types, module_args):
                 modules_error = True
         if modules_error:
             sys.exit(0)
-        print("Imported successfully!")
+        # print("Imported successfully!")
     return modules
 
 def main():
-    print("MAIN")
+    # print("MAIN")
     args = parse_args()
-    print(args)
+    # print(args)
 
     inputs = get_modules([MODULES.INPUTS], args[MODULES.INPUTS])
-    print(inputs)
+    # print(inputs)
 
     outputs = get_modules([MODULES.OUTPUTS], args[MODULES.OUTPUTS])
-    print(outputs)
+    # print(outputs)
 
     for m in inputs:
         m.init()
@@ -79,8 +79,7 @@ def main():
         time.sleep(1)
         out = {}
         for m in inputs:
-            print("Getting info from ", m.__name__)
-            out[m.__name__] = m.run()
+            out[m.__name__.replace('inputs.','')] = m.run()
         output = outputs[0].run(out)
         print(output)
 

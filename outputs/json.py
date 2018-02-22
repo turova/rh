@@ -1,5 +1,5 @@
 def init():
-    print("Initializing json")
+    # print("Initializing json")
     return 0
 
 def run(data):

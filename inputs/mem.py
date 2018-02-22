@@ -25,22 +25,25 @@ def time_now():
 #https://unix.stackexchange.com/questions/261247/how-can-i-get-the-amount-of-available-memory-portably-across-distributions/261252
 #https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=34e431b0a
 def mem_now():
-    meminfo = get_meminfo()
-    zoneinfo = get_zoneinfo()
+    # meminfo = get_meminfo()
+    # zoneinfo = get_zoneinfo()
 
-    # global proc_meminfo
-    # if proc_meminfo is None:
-    #     proc_meminfo = open('/proc/meminfo', 'r')
-    # proc_meminfo.seek(0)
+    global proc_meminfo
+    if proc_meminfo is None:
+        proc_meminfo = open('/proc/meminfo', 'r')
+    proc_meminfo.seek(0)
     # mem_lines = {}
     # for line in proc_meminfo:
     #     split_line = line.strip().split()
     #     mem_lines[split_line[0].replace(':', '')] = split_line[1]
     
-    # # mem_lines = {}
-    # # for i in range(0,5):
-    # #     line = proc_meminfo.readline().strip().split()
-    # #     mem_lines[line[0].replace(':', '')] = line[1]
+    mem_lines = {}
+    for i in range(0,3):
+        line = proc_meminfo.readline()
+        if (i == 2):
+            line = line.strip().split()
+            return line[1]
+        # mem_lines[line[0].replace(':', '')] = line[1]
     # # mem_lines = proc_meminfo.readlines()
     # print(mem_lines)
     # return mem_lines
@@ -89,19 +92,19 @@ def get_meminfo():
 def init():
     global mem
     global last_measurement
-    print("Initializing mem")
+    # print("Initializing mem")
     # mem = mem_now()
     # last_measurement = time_now()
 
 def run():
     # return read_mem()
-    # return mem_now()
-    meminfo = get_meminfo()
-    zoneinfo = get_zoneinfo()
+    return mem_now()
+    # meminfo = get_meminfo()
+    # zoneinfo = get_zoneinfo()
 
-    available_mem = sum(meminfo.values()) - zoneinfo*12
+    # available_mem = sum(meminfo.values()) - zoneinfo*12
 
-    return available_mem
+    # return available_mem
 
 def info():
     return "Help for mem"
