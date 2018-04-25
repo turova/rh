@@ -5,49 +5,47 @@ import time
 import importlib
 import sys
 
-class Cls():
-    pass
-
-MODULES_OBJECT = {
-    'INPUTS': 'inputs',
-    'OUTPUTS': 'outputs'
-}
-
-#MODULES = SimpleNamespace(**MODULES_OBJECT)
-MODULES = Cls()
-MODULES.INPUTS = 'inputs'
-MODULES.OUTPUTS = 'outputs'
-    # 'inputs': 'inputs',
-    # 'outputs': 'outputs'
-
-
+#List of functions that are required to be implemented in any submodules
 REQUIRED_FUNC_NAMES = ['run', 'info']
 
 def parse_args():
+    """
+    Parse CLI args and enable a --help document
+    """
     parser = argparse.ArgumentParser(description="Resource Harvester")
     parser.add_argument('-i', '--inputs', nargs='+', default=['cpu', 'mem'],
                         help='Space-separated list of input modules to use')
     parser.add_argument('-o', '--outputs', nargs=1, default=['json'],
                         help='Output module to use (default is JSON). Currently, only 1 output is supported')
-    parser.add_argument('-t', '--interval', nargs=1, type=float, default=1,
+    parser.add_argument('-t', '--interval', type=float, default=1.0,
                         help='Number of seconds between harvest/print cycles')
     args = parser.parse_args()
-    return vars(args)
+    return args
 
 def get_modules(module_types, module_args):
-    # print('Getting ' + str(module_types) + ' - ' + str(module_args))
+    """
+    Programmatically verify and import list of modules (also called libraries in Python) as specified by arguments:
+    module_types - array with types of module (i.e. 'inputs' or 'outputs'). Corresponds with folder modules are in. For now, an array with a single value is the most appropriate argument (i.e. ['inputs'])
+    module_args - names of individual modules to import from module_types folder(s)
+
+    This function also confirms the presence of required module functions specified by REQUIRED_FUNC_NAMES
+    Returns list of imported modules
+    """
     modules = []
     modules_error = False
     for mt in module_types:
         for i in module_args:
             try:
-                # print("Importing " + mt + "." + i)
+                # For each module, import it, test it for required functionality
+                # and append to list of modules
+                # If an error occurs, print it to screen and exit
                 m = importlib.import_module(mt + '.' + i)
                 for fn in REQUIRED_FUNC_NAMES:
                     if callable(getattr(m, fn, None)) is False:
                         print('Module ' + m.__name__ + ' must implement function ' + fn)
                         modules_error = True
                         pass
+                m.init()
                 modules.append(m)
             except Exception:
                 print("Error importing input module", i)
@@ -55,35 +53,28 @@ def get_modules(module_types, module_args):
                 modules_error = True
         if modules_error:
             sys.exit(0)
-        # print("Imported successfully!")
     return modules
 
 def main():
-    # print("MAIN")
     args = parse_args()
-    # print(args)
 
-    inputs = get_modules([MODULES.INPUTS], args[MODULES.INPUTS])
-    # print(inputs)
-
-    outputs = get_modules([MODULES.OUTPUTS], args[MODULES.OUTPUTS])
-    # print(outputs)
-
-    for m in inputs:
-        m.init()
-
-    for m in outputs:
-        m.init()
+    # Import list of input and output modules as specified by command-line args
+    inputs = get_modules(['inputs'], args.inputs)
+    outputs = get_modules(['outputs'], args.outputs)
 
     while True:
-        time.sleep(1)
         out = {}
+        # TODO: Make interval more predictable (i.e. 1 second interval starts on the second)
+        time.sleep(args.interval)
+        
+        # TODO: Figure out how to remove "inputs." from module name
+        # Gather data from all inputs
         for m in inputs:
             out[m.__name__.replace('inputs.','')] = m.run()
+
+        # Process input data through output function
         output = outputs[0].run(out)
         print(output)
-
-
 
 if __name__ == "__main__":
     main()
