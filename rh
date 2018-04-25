@@ -9,7 +9,7 @@ import os
 from fnmatch import fnmatch
 
 #List of functions that are required to be implemented in any submodules
-REQUIRED_FUNC_NAMES = ['run', 'info']
+REQUIRED_FUNC_NAMES = ['run', 'info', 'init']
 
 def parse_args():
     """
@@ -18,7 +18,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Resource Harvester")
     parser.add_argument('-l', '--list', action="store_true",
                         help='List all available modules and their descriptions')
-    parser.add_argument('-i', '--inputs', nargs='+', default=['cpu', 'mem'],
+    parser.add_argument('-i', '--inputs', nargs='+', default=['timestamp', 'cpu', 'mem'],
                         help='Space-separated list of input modules to use')
     parser.add_argument('-o', '--outputs', nargs=1, default=['json'],
                         help='Output module to use (default is JSON). Currently, only 1 output is supported')
