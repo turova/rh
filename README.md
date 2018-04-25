@@ -3,7 +3,7 @@ Resource Harvester - a tool to gather low-level system data and make it easy to 
 
 ## OVERVIEW
 
-This tool allows a user to gather system data and output it in a way that's easy to process programmatically. It is extensible for both input modules and output modules, allowing a user to add new input data and to add new output formats. Some example use cases include saving a TSV log and plotting the time-series data or piping data into Fluentd.
+This tool allows a user to gather system data and output it in a way that's easy to process programmatically. It is extensible for both input modules and output modules, allowing a user to add new input data and to add new output formats. The motivation for this tool was the lack of consistent output in tools such as top and dstat. Some example use cases include saving a TSV log and plotting the time-series data or piping data into Fluentd.
 
 ## USAGE
 
@@ -57,7 +57,7 @@ $ ./rh -t .5 -i timestamp cpu -o tsv
   * ```json``` - JSON output
 
 ## WRITING NEW MODULES
-Writing a new modules is as simple as creating three functions:
+Writing a new modules is as simple as creating three functions and placing them in the appropriate folder (```inputs/``` or ```outputs/```:
 - ```init()``` - Called when module is initially imported. This can be used for initializing values, marking a start timestamp, etc.
 - ```run()``` - Called every interval to gather resources and return a value that can be printed. Can be string or number (ends up going through a str() conversion), but should not include endlines or other whitespace characters for positioning
 - ```info()``` - Called when ```rh --info``` is called. Should return a string with a summary of the data the module gathers
