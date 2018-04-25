@@ -1,6 +1,5 @@
 import time
 from datetime import datetime
-# from logging import Logger
 
 proc_stat = None
 
@@ -26,13 +25,11 @@ def cpu_now():
             map(int,cpu_array[2:5] + cpu_array[6:9])#Convert all non-steal/non-guest CPU values to ints
             )
         )
-    # print(cpu_array)
     return cpu_sum
 
 def init():
     global cpu
     global last_measurement
-    # print("Initializing cpu")
     cpu = cpu_now()
     last_measurement = time_now()
 
@@ -46,7 +43,6 @@ def read_cpu():
     cpu_difference = new_cpu - cpu
 
     cpu_utilization = cpu_difference / time_difference
-    # print(str(cpu_difference) + '/' + str(time_difference))
 
     cpu = new_cpu
     last_measurement = new_measurement
@@ -54,8 +50,7 @@ def read_cpu():
     return int(cpu_utilization)
 
 def run():
-    # proc_stat.seek(0) #Go back to beginning of file
     return read_cpu()
 
 def info():
-    return "Help for cpu"
+    return "Returns the percentage of all non-steal, non-guest, non-idle CPU cycles"
