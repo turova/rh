@@ -3,7 +3,7 @@ Resource Harvester - a tool to gather low-level system data and make it easy to 
 
 ## OVERVIEW
 
-This tool allows a user to gather system data and output it in a way that's easy to process programmatically. It is extensible for both input modules and output modules, allowing a user to add new input data and to add new output formats.
+This tool allows a user to gather system data and output it in a way that's easy to process programmatically. It is extensible for both input modules and output modules, allowing a user to add new input data and to add new output formats. Some example use cases include saving a TSV log and plotting the time-series data or piping data into Fluentd.
 
 ## USAGE
 
